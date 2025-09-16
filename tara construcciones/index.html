@@ -5,8 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Tara Construcción</title>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 </head>
 <body>
 
@@ -40,24 +40,20 @@
     </div>
   </section>
 
-  <!-- Sección de Comentarios -->
+  <!-- Comentarios -->
   <section class="testimonials" id="comentarios">
     <h2>Lo que dicen nuestros clientes</h2>
 
-    <!-- Botón para mostrar formulario -->
     <button id="mostrarFormBtn">➕ Agregar comentario</button>
 
-    <!-- Formulario oculto por defecto -->
-    <form id="comentarioForm" style="display: none;">
+    <form id="comentarioForm" style="display:none;">
       <input type="text" id="nombreCliente" placeholder="Tu nombre" required>
       <textarea id="textoComentario" rows="3" placeholder="Escribe tu comentario..." required></textarea>
       <button type="submit">Enviar comentario</button>
     </form>
 
-    <!-- Botón modo admin -->
     <button id="adminBtn">🔑 Modo Administrador</button>
 
-    <!-- Lista de comentarios -->
     <div id="listaComentarios"></div>
   </section>
 
@@ -66,13 +62,13 @@
     <p>&copy; 2025 Tara Construcción | Todos los derechos reservados</p>
   </footer>
 
-  <!-- Firebase SDK compat -->
+  <!-- Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
 
   <script>
-    // Configuración de Firebase
+    // Configuración Firebase
     const firebaseConfig = {
       apiKey: "AIzaSyAJ4HtijLjn1uQLOiSr-CSkYNTNIMBlqGM",
       authDomain: "taraconstruccion-96c00.firebaseapp.com",
@@ -81,7 +77,6 @@
       messagingSenderId: "995744283549",
       appId: "1:995744283549:web:645aff3360ab00dc464d74"
     };
-
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
     const auth = firebase.auth();
