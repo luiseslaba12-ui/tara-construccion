@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tara Construcción</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Encabezado -->
+  <header>
+    <img src="img/logo.png" alt="Logo Tara Construcción" class="logo">
+    <h1>Tara Construcción</h1>
+    <p>Construimos tus sueños con calidad, innovación y confianza</p>
+    <a href="https://wa.me/522381130356?text=Hola%20quiero%20una%20cotizacion%20con%20Tara%20Construccion" 
+       class="btn-cta" target="_blank" rel="noopener noreferrer">
+       📲 Pide tu cotización
+    </a>
+  </header>
+
+  <!-- Menú -->
+  <nav>
+    <a href="#servicios">Servicios</a>
+    <a href="#proyectos">Proyectos</a>
+    <a href="#contacto">Contacto</a>
+    <a href="#comentarios">Comentarios</a>
+  </nav>
+
+  <!-- Servicios -->
+  <section id="servicios">
+    <h2>Nuestros Servicios</h2>
+    <div class="services">
+      <div class="card"><h3>🏠 Construcción de casas</h3><p>Diseños modernos y funcionales.</p></div>
+      <div class="card"><h3>🔨 Remodelaciones</h3><p>Transformamos tus espacios.</p></div>
+      <div class="card"><h3>🏗️ Obra civil</h3><p>Proyectos de gran escala.</p></div>
+      <div class="card"><h3>📐 Consultoría</h3><p>Asesoría profesional.</p></div>
+    </div>
+  </section>
+
+  <!-- Sección de Comentarios -->
+  <section class="testimonials" id="comentarios">
+    <h2>Lo que dicen nuestros clientes</h2>
+
+    <!-- Botón para mostrar formulario -->
+    <button id="mostrarFormBtn">➕ Agregar comentario</button>
+
+    <!-- Formulario oculto por defecto -->
+    <form id="comentarioForm" style="display: none;">
+      <input type="text" id="nombreCliente" placeholder="Tu nombre" required>
+      <textarea id="textoComentario" rows="3" placeholder="Escribe tu comentario..." required></textarea>
+      <button type="submit">Enviar comentario</button>
+    </form>
+
+    <!-- Botón modo admin -->
+    <button id="adminBtn">🔑 Modo Administrador</button>
+
+    <!-- Lista de comentarios -->
+    <div id="listaComentarios"></div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <p>&copy; 2025 Tara Construcción | Todos los derechos reservados</p>
+  </footer>
+
+  <!-- Firebase SDK compat -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+
+  <script>
+    // Configuración de Firebase
+    const firebaseConfig = {
+      apiKey: "AIzaSyAJ4HtijLjn1uQLOiSr-CSkYNTNIMBlqGM",
+      authDomain: "taraconstruccion-96c00.firebaseapp.com",
+      projectId: "taraconstruccion-96c00",
+      storageBucket: "taraconstruccion-96c00.firebasestorage.app",
+      messagingSenderId: "995744283549",
+      appId: "1:995744283549:web:645aff3360ab00dc464d74"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+    const auth = firebase.auth();
+  </script>
+
+  <script>
+    const mostrarFormBtn = document.getElementById("mostrarFormBtn");
+    const comentarioForm = document.getElementById("comentarioForm");
+    const listaComentarios = document.getElementById("listaComentarios");
+    const adminBtn = document.getElementById("adminBtn");
+
+    let esAdmin = false;
+
+    // Mostrar/ocultar formulario
+    mostrarFormBtn.addEventListener("click", () => {
+      comentarioForm.style.display = comentarioForm.style.display === "none" ? "block" : "none";
+    });
+
+    // Enviar comentario
+    comentarioForm.addEventListener("submit", async e => {
+      e.preventDefault();
+      const nombre = document.getElementById("nombreCliente").value.trim();
+      const texto = document.getElementById("textoComentario").value.trim();
+      if (!nombre || !texto) return;
+
+      try {
+        await db.collection("comentarios").add({
+          nombre,
+          texto,
+          fecha: new Date()
+        });
+        comentarioForm.reset();
+        comentarioForm.style.display = "none";
+      } catch (err) {
+        alert("Error al enviar comentario: " + err.message);
+      }
+    });
+
+    // Mostrar comentarios en tiempo real
+    db.collection("comentarios").orderBy("fecha", "desc").onSnapshot(snapshot => {
+      listaComentarios.innerHTML = "";
+      snapshot.forEach(doc => {
+        const c = doc.data();
+        const div = document.createElement("div");
+        div.className = "testimonial-card";
+        div.innerHTML = `
+          <p>"${c.texto}"</p>
+          <strong>- ${c.nombre}</strong>
+          ${esAdmin ? `<button onclick="borrarComentario('${doc.id}')">🗑 Borrar</button>` : ""}
+        `;
+        listaComentarios.appendChild(div);
+      });
+    });
+
+    // Activar modo administrador
+    adminBtn.addEventListener("click", async () => {
+      const correo = prompt("Introduce tu correo de administrador:");
+      const clave = prompt("Introduce tu contraseña:");
+      try {
+        await auth.signInWithEmailAndPassword(correo, clave);
+        esAdmin = true;
+        alert("Modo administrador activado. Ahora puedes borrar comentarios.");
+      } catch (err) {
+        alert("Error de autenticación: " + err.message);
+      }
+    });
+
+    // Borrar comentario
+    async function borrarComentario(id) {
+      if (!esAdmin) return;
+      await db.collection("comentarios").doc(id).delete();
+    }
+  </script>
+</body>
+</html>
